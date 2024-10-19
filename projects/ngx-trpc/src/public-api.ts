@@ -1,6 +1,2 @@
-/*
- * Public API Surface of ngx-trpc
- */
-
-export * from './lib/ngx-trpc.service';
-export * from './lib/ngx-trpc.component';
+export * from './lib/trpc.provider';
+export * from './lib/client';

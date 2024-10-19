@@ -2,11 +2,12 @@ import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
   isMainModule,
-  writeResponseToNodeResponse,
+  writeResponseToNodeResponse
 } from '@angular/ssr/node';
 import express from 'express';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import {dirname, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createServerHandler} from './trpc/router';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -14,17 +15,7 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+app.use('/trpc', createServerHandler());
 
 /**
  * Serve static files from /browser
@@ -39,8 +30,8 @@ app.get(
       for (const [key, value] of headers) {
         res.setHeader(key, value);
       }
-    },
-  }),
+    }
+  })
 );
 
 /**
@@ -49,9 +40,7 @@ app.get(
 app.get('**', (req, res, next) => {
   angularApp
     .render(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
     .catch(next);
 });
 

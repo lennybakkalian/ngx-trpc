@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {TRPC} from './app.config';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,6 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'example';
+
+  trpc = inject(TRPC);
 }

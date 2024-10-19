@@ -76,3 +76,10 @@ const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+export function createServerHandler() {
+  return trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext
+  });
+}
