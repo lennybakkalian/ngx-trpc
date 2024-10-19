@@ -1,10 +1,16 @@
-import {InjectionToken, PLATFORM_ID, Provider} from '@angular/core';
+import {InjectionToken, PLATFORM_ID, Provider, TransferState} from '@angular/core';
 import {ITrpcConfig} from './trpc.config';
 import {AnyRouter} from '@trpc/server';
 import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/createRxjsClient';
 import {createWSClient, httpLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
 import {resolveTrpcLink} from './utils/link-resolver';
 import {isPlatformBrowser} from '@angular/common';
+import {
+  provideTrpcCacheState,
+  provideTrpcCacheStateStatusManager,
+  tRPC_CACHE_STATE
+} from './utils/cache-state';
+import {transferStateLink} from './utils/transfer-state-link';
 
 type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
 
@@ -17,6 +23,8 @@ export function provideTrpc<AppRouter extends AnyRouter>(
   config: ITrpcConfig
 ): Provider[] {
   return [
+    provideTrpcCacheState(),
+    provideTrpcCacheStateStatusManager(),
     {
       provide: token,
       useFactory: (platformId: Object) => {
@@ -42,10 +50,10 @@ export function provideTrpc<AppRouter extends AnyRouter>(
         }
 
         return createTRPCRxJSProxyClient({
-          links: [link]
+          links: [transferStateLink(), link]
         });
       },
-      deps: [PLATFORM_ID]
+      deps: [PLATFORM_ID, tRPC_CACHE_STATE, TransferState]
     }
   ];
 }

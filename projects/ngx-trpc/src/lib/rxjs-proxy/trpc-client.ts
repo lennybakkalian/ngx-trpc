@@ -11,6 +11,7 @@ import {
 import {createChain} from './internals/createChain';
 import {Maybe, TRPCSubscriptionObserver, TRPCType} from './internals/types';
 import {map, Observable as RxJSObservable} from 'rxjs';
+import {waitFor} from '../utils/wait-for';
 
 export class TRPCClient<TRouter extends AnyRouter> {
   private readonly links: OperationLink<TRouter>[];
@@ -42,19 +43,11 @@ export class TRPCClient<TRouter extends AnyRouter> {
       }
     });
     type TValue = inferObservableValue<typeof chain$>;
-    return trpcObservableToRxJsObservable<TValue>(chain$.pipe(share())).pipe(
+    const x = trpcObservableToRxJsObservable<TValue>(chain$.pipe(share())).pipe(
       map((envelope) => envelope.result.data!)
     );
-  }
-
-  private requestAsPromise<TInput = unknown, TOutput = unknown>(opts: {
-    type: TRPCType;
-    input: TInput;
-    path: string;
-    context?: OperationContext;
-    signal: Maybe<AbortSignal>;
-  }): RxJSObservable<TOutput> {
-    return this.$request<TInput, TOutput>(opts);
+    waitFor(x);
+    return x;
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
@@ -90,40 +83,6 @@ export class TRPCClient<TRouter extends AnyRouter> {
       signal: opts?.signal
     });
   }
-
-  /*public subscription(
-    path: string,
-    input: unknown,
-    opts: Partial<TRPCSubscriptionObserver<unknown, TRPCClientError<AnyRouter>>> &
-      TRPCRequestOptions
-  ): Unsubscribable {
-    const observable$ = this.$request({
-      type: 'subscription',
-      path,
-      input,
-      context: opts?.context,
-      signal: opts.signal
-    });
-    return observable$.subscribe({
-      next(envelope) {
-        if (envelope.result.type === 'started') {
-          opts.onStarted?.({
-            context: envelope.context
-          });
-        } else if (envelope.result.type === 'stopped') {
-          opts.onStopped?.();
-        } else {
-          opts.onData?.(envelope.result.data);
-        }
-      },
-      error(err) {
-        opts.onError?.(err);
-      },
-      complete() {
-        opts.onComplete?.();
-      }
-    });
-  }*/
 }
 
 function trpcObservableToRxJsObservable<TValue>(
