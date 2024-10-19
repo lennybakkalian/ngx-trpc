@@ -1,5 +1,3 @@
-<h1>Angular TRPC</h1>
-
 <div class="demo-container">
   query:
   <pre>{{ (demoQuery$ | async) ?? 'loading'}}</pre>
@@ -17,4 +15,9 @@
 <div>
   <input type="text" [formControl]="addPostTitle" />
   <button (click)="addPost()">Add Post</button>
+</div>
+
+<div class="demo-container" style="flex-direction:column;align-items:flex-start;margin-top:30px">
+  received events:
+  <pre>{{(events$ | async) | json}}</pre>
 </div>

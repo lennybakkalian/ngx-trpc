@@ -19,3 +19,16 @@ body {
     white-space: normal;
   }
 }
+
+a {
+  color: #007bff;
+  text-decoration: none;
+
+  &:hover {
+    color: #0056b3;
+  }
+
+  &.active {
+    text-decoration: underline;
+  }
+}
