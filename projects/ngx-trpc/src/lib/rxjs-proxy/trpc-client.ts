@@ -8,10 +8,10 @@ import {
   TRPCClientRuntime,
   TRPCRequestOptions
 } from '@trpc/client';
-import {createChain} from './internals/createChain';
-import {Maybe, TRPCSubscriptionObserver, TRPCType} from './internals/types';
+import {Maybe, TRPCSubscriptionObserver, TRPCType} from './types';
 import {map, Observable, Observable as RxJSObservable} from 'rxjs';
 import {waitFor} from '../utils/wait-for';
+import {createChain} from './createChain';
 
 export class TRPCClient<TRouter extends AnyRouter> {
   private readonly links: OperationLink<TRouter>[];

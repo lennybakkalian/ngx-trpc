@@ -10,6 +10,7 @@
 ## Table of Contents
 - [Inspiration](#inspiration-)
 - [Getting Started](#getting-started-)
+- [Server Side Rendering](#server-side-rendering)
 - [TODOs](#todos-)
 - [Disclaimer](#disclaimer-)
 
@@ -64,4 +65,15 @@ export class DemoComponent {
   
   readonly demoQuery$ = this.trpc.hello.query();
 }
+```
+
+## Server Side Rendering
+You can use different link configurations for server-side. So you can directly connect to the backend.
+```typescript
+provideTrpc(TRPC, {
+  http: {
+    url: 'https://api.example.com/trpc',
+    ssrUrl: 'http://backend_host:4444/trpc' // <-- Add this line. This host will be used on the server
+  }
+})
 ```

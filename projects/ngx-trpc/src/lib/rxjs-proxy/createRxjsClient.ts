@@ -12,7 +12,7 @@ import type {
 } from '@trpc/server/unstable-core-do-not-import';
 import {createFlatProxy, createRecursiveProxy} from '@trpc/server/unstable-core-do-not-import';
 import {TRPCClient} from './trpc-client';
-import {TRPCSubscriptionObserver, UntypedClientProperties} from './internals/types';
+import {TRPCSubscriptionObserver, UntypedClientProperties} from './types';
 import {CreateTRPCClientOptions, TRPCClientError} from '@trpc/client';
 import {Observable as RxJSObservable} from 'rxjs';
 
