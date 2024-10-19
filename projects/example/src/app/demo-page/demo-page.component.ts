@@ -27,7 +27,7 @@ export class DemoPageComponent {
   addPost() {
     this.trpc.createPost.mutate({title: this.addPostTitle.value!}).subscribe((response) => {
       this.refreshPosts$.next();
-      console.log(response);
+      console.log({response});
     });
   }
 }

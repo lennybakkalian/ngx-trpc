@@ -12,8 +12,6 @@ export function createTrpcInjectionToken<T extends AnyRouter>() {
   return new InjectionToken<TrpcClient<T>>('TrpcClient');
 }
 
-export const TRPC_CONFIG = new InjectionToken<ITrpcConfig>('TRPC_CONFIG');
-
 export function provideTrpc<AppRouter extends AnyRouter>(
   token: InjectionToken<AppRouter>,
   config: ITrpcConfig
@@ -32,6 +30,7 @@ export function provideTrpc<AppRouter extends AnyRouter>(
 
         if (config.ws && _isBrowser) {
           const wsClient = createWSClient({
+            ...config.ws,
             url: resolveTrpcLink(_isBrowser, config.ws)
           });
 
