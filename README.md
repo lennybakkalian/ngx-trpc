@@ -17,6 +17,11 @@ A modern, type-safe client for Angular that leverages **tRPC** to seamlessly int
 - **Reactive Streams**: Utilize RxJS for handling API responses and WebSocket streams like a pro.
 - **Subscriptions**: Native support for subscriptions using WebSockets, fully integrated with RxJS.
 
+## Inspiration 💡
+
+This project was inspired by the amazing work of [`@analogjs/trpc`](https://github.com/analogjs/analog/tree/main/packages/trpc). It builds upon the same principles of type-safe API communication and seamless Angular integration, with added features such as WebSocket subscriptions.
+
+
 ## TODOs 📝
 
 - [ ] **Rehydration Support**: Implement state rehydration to optimize Server-Side Rendering (SSR) and client-side hydration, ensuring faster load times and reducing redundant API calls.
