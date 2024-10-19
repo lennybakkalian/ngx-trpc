@@ -7,9 +7,6 @@ import {
 import express from 'express';
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {appRouter, AppRouter, createContext, createServerHandler} from './trpc/router';
-import {WebSocketServer} from 'ws';
-import {applyWSSHandler} from '@trpc/server/adapters/ws';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -17,19 +14,6 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 const app = express();
 
 const angularApp = new AngularNodeAppEngine();
-
-const wss = new WebSocketServer({port: 4201});
-applyWSSHandler<AppRouter>({
-  wss,
-  router: appRouter,
-  createContext
-});
-wss.on('connection', () => console.log('ws connection'));
-wss.on('error', console.error);
-app.use('/trpc', createServerHandler());
-
-process.on('SIGINT', () => console.log('SIGINIT'));
-process.on('SIGTERM', () => console.log('SIGTERM'));
 
 /**
  * Serve static files from /browser
