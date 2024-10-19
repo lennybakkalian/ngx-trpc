@@ -3,12 +3,11 @@ import {AsyncPipe, isPlatformBrowser, JsonPipe} from '@angular/common';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TRPC} from '../app.config';
 import {BehaviorSubject, of, switchMap, tap} from 'rxjs';
-import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-demo-page',
   standalone: true,
-  imports: [AsyncPipe, ReactiveFormsModule, RouterLink, JsonPipe],
+  imports: [AsyncPipe, ReactiveFormsModule, JsonPipe],
   templateUrl: './demo-page.component.html'
 })
 export class DemoPageComponent {
@@ -16,19 +15,17 @@ export class DemoPageComponent {
 
   readonly trpc = inject(TRPC);
 
-  demoQuery$ = this.trpc._trpc.hello.query();
+  demoQuery$ = this.trpc.hello.query();
 
   refreshPosts$ = new BehaviorSubject<void>(undefined);
-  posts$ = this.refreshPosts$.pipe(switchMap(() => this.trpc._trpc.listPosts.query()));
+  posts$ = this.refreshPosts$.pipe(switchMap(() => this.trpc.listPosts.query()));
 
   addPostTitle = new FormControl('random-post');
 
-  events$ = !this._isBrowser
-    ? of(null)
-    : this.trpc._trpc.onPostAdd.subscribe().pipe(tap(console.log));
+  events$ = !this._isBrowser ? of(null) : this.trpc.onPostAdd.subscribe().pipe(tap(console.log));
 
   addPost() {
-    this.trpc._trpc.createPost.mutate({title: this.addPostTitle.value!}).subscribe((response) => {
+    this.trpc.createPost.mutate({title: this.addPostTitle.value!}).subscribe((response) => {
       this.refreshPosts$.next();
       console.log(response);
     });
