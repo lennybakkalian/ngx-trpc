@@ -12,8 +12,8 @@ import type {
 } from '@trpc/server/unstable-core-do-not-import';
 import {createFlatProxy, createRecursiveProxy} from '@trpc/server/unstable-core-do-not-import';
 import {TRPCClient} from './trpc-client';
-import {UntypedClientProperties} from './internals/types';
-import {CreateTRPCClientOptions} from '@trpc/client';
+import {TRPCSubscriptionObserver, UntypedClientProperties} from './internals/types';
+import {CreateTRPCClientOptions, TRPCClientError} from '@trpc/client';
 import {Observable as RxJSObservable} from 'rxjs';
 
 /**
@@ -37,10 +37,10 @@ export type Resolver<TDef extends ResolverDef> = (
   opts?: ProcedureOptions
 ) => RxJSObservable<TDef['output']>;
 
-/*type SubscriptionResolver<TDef extends ResolverDef> = (
+type SubscriptionResolver<TDef extends ResolverDef> = (
   input: TDef['input'],
   opts?: Partial<TRPCSubscriptionObserver<TDef['output'], TRPCClientError<TDef>>> & ProcedureOptions
-) => Unsubscribable;*/
+) => RxJSObservable<TDef['output']>;
 
 type DecorateProcedure<
   TType extends ProcedureType,
@@ -55,7 +55,7 @@ type DecorateProcedure<
       }
     : TType extends 'subscription'
       ? {
-          //subscribe: SubscriptionResolver<TDef>;
+          subscribe: SubscriptionResolver<TDef>;
         }
       : never;
 
@@ -82,8 +82,8 @@ type DecoratedProcedureRecord<TRouter extends AnyRouter, TRecord extends RouterR
 
 const clientCallTypeMap: Record<keyof DecorateProcedure<any, any>, ProcedureType> = {
   query: 'query',
-  mutate: 'mutation'
-  //subscribe: 'subscription'
+  mutate: 'mutation',
+  subscribe: 'subscription'
 };
 
 /** @internal */

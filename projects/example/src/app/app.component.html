@@ -1,6 +1,20 @@
 <h1>Angular TRPC</h1>
 
 <div class="demo-container">
-  query from trpc:
+  query:
   <pre>{{ (demoQuery$ | async) ?? 'loading'}}</pre>
+</div>
+
+<div class="demo-container">
+  post list:
+  <pre>
+    @for (post of posts$ | async; track post.id) {
+      {{ post.title }}
+    }
+  </pre>
+</div>
+
+<div>
+  <input type="text" [formControl]="addPostTitle" />
+  <button (click)="addPost()">Add Post</button>
 </div>

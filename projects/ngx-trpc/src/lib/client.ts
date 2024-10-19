@@ -25,8 +25,8 @@ export class TrpcClient<TRouter extends AnyRouter> {
 
       link = splitLink({
         condition: (op) => op.type === 'subscription',
-        true: trpcHttpLink,
-        false: wsLink({client: wsClient})
+        true: wsLink({client: wsClient}),
+        false: trpcHttpLink
       });
     }
 

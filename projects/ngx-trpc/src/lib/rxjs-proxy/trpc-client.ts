@@ -9,7 +9,7 @@ import {
   TRPCRequestOptions
 } from '@trpc/client';
 import {createChain} from './internals/createChain';
-import {Maybe, TRPCType} from './internals/types';
+import {Maybe, TRPCSubscriptionObserver, TRPCType} from './internals/types';
 import {map, Observable as RxJSObservable} from 'rxjs';
 
 export class TRPCClient<TRouter extends AnyRouter> {
@@ -58,7 +58,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
-    return this.requestAsPromise<unknown, unknown>({
+    return this.$request({
       type: 'query',
       path,
       input,
@@ -67,7 +67,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
     });
   }
   public mutation(path: string, input?: unknown, opts?: TRPCRequestOptions) {
-    return this.requestAsPromise<unknown, unknown>({
+    return this.$request({
       type: 'mutation',
       path,
       input,
@@ -76,42 +76,21 @@ export class TRPCClient<TRouter extends AnyRouter> {
     });
   }
 
-  /*private async requestAsPromise<TInput = unknown, TOutput = unknown>(opts: {
-    type: TRPCType;
-    input: TInput;
-    path: string;
-    context?: OperationContext;
-    signal: Maybe<AbortSignal>;
-  }): Promise<TOutput> {
-    try {
-      const req$ = this.$request<TInput, TOutput>(opts);
-      type TValue = inferObservableValue<typeof req$>;
+  public subscription(
+    path: string,
+    input: unknown,
+    opts: Partial<TRPCSubscriptionObserver<unknown, TRPCClientError<AnyRouter>>> &
+      TRPCRequestOptions
+  ) {
+    return this.$request({
+      type: 'subscription',
+      path,
+      input,
+      context: opts?.context,
+      signal: opts?.signal
+    });
+  }
 
-      const envelope = await observableToPromise<TValue>(req$);
-      const data = (envelope.result as any).data;
-      return data;
-    } catch (err) {
-      throw TRPCClientError.from(err as Error);
-    }
-  }
-  public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
-    return this.requestAsPromise<unknown, unknown>({
-      type: 'query',
-      path,
-      input,
-      context: opts?.context,
-      signal: opts?.signal
-    });
-  }
-  public mutation(path: string, input?: unknown, opts?: TRPCRequestOptions) {
-    return this.requestAsPromise<unknown, unknown>({
-      type: 'mutation',
-      path,
-      input,
-      context: opts?.context,
-      signal: opts?.signal
-    });
-  }*/
   /*public subscription(
     path: string,
     input: unknown,
