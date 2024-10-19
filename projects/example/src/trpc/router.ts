@@ -47,10 +47,20 @@ export const appRouter = router({
     )
     .subscription(async function* (opts) {
       if (opts.input?.lastEventId) {
-        // [...] get the posts since the last event id and yield them
+        // replay missed events
+        const lastEventId = parseInt(opts.input.lastEventId);
+        for (const post of db) {
+          if (post.id > lastEventId) {
+            yield tracked(String(post.id), post);
+          }
+        }
+      } else {
+        // send all posts
+        for (const post of db) {
+          yield tracked(String(post.id), post);
+        }
       }
-      //console.log(opts);
-      // listen for new events
+
       for await (const [data] of on(ee, 'add', {
         // Passing the AbortSignal from the request automatically cancels the event emitter when the subscription is aborted
         signal: opts.signal

@@ -1,26 +1,31 @@
-## Disclaimer ⚠️
-
-This project is a **work in progress**. Features and APIs may change as development continues. Use at your own risk, and expect frequent updates. Contributions and feedback are always welcome!
-
-
 # Angular tRPC Client 🚀
 
+## Features
 - **Full Type Safety**: Enjoy end-to-end type safety for all your API calls.
 - **SSR-Ready**: Optimized for Angular Universal and Server-Side Rendering (SSR).
 - **Reactive Streams**: Utilize RxJS for handling API responses and WebSocket streams like a pro.
 - **Subscriptions**: Native support for subscriptions using WebSockets, fully integrated with RxJS.
 
+
+## Table of Contents
+- [Inspiration](#inspiration-)
+- [Getting Started](#getting-started-)
+- [TODOs](#todos-)
+- [Disclaimer](#disclaimer-)
+
 ## Inspiration 💡
 
 This project was inspired by the amazing work of [`@analogjs/trpc`](https://github.com/analogjs/analog/tree/main/packages/trpc). It builds upon the same principles of type-safe API communication and seamless Angular integration, with added features such as WebSocket subscriptions.
 
-
 ## TODOs 📝
 
-- [ ] **Rehydration Support**: Implement state rehydration to optimize Server-Side Rendering (SSR) and client-side hydration, ensuring faster load times and reducing redundant API calls.
 - [ ] Additional Unit Tests for SSR and WebSocket Subscriptions.
 - [ ] Improve Error Handling and Logging.
 - [ ] Handle subscriptions server-side. Currently, subscriptions are only supported client-side.
+
+## Disclaimer ⚠️
+
+This project is a **work in progress**. Features and APIs may change as development continues. Use at your own risk, and expect frequent updates. Contributions and feedback are always welcome!
 
 ---
 

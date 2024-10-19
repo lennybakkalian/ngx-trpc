@@ -25,7 +25,7 @@ export class DemoPageComponent {
 
   addPostTitle = new FormControl('random-post');
 
-  events$ = this.trpc.onPostAdd.subscribe();
+  events$ = this.trpc.onPostAdd.subscribe({lastEventId: '1'});
 
   addPost() {
     this.trpc.createPost.mutate({title: this.addPostTitle.value!}).subscribe((response) => {
