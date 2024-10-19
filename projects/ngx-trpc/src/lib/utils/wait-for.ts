@@ -1,14 +1,10 @@
-import {firstValueFrom, isObservable, Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 
 declare const Zone: any;
 
-export async function waitFor<T>(prom: Promise<T> | Observable<T>): Promise<T> {
-  if (isObservable(prom)) {
-    prom = firstValueFrom(prom);
-  }
-
+export function waitFor<T>(observable: Observable<T>) {
   if (typeof Zone === 'undefined') {
-    return prom;
+    return;
   }
 
   const macroTask = Zone.current.scheduleMacroTask(
@@ -17,8 +13,6 @@ export async function waitFor<T>(prom: Promise<T> | Observable<T>): Promise<T> {
     {},
     () => {}
   );
-  return prom.then((p: T) => {
-    macroTask.invoke();
-    return p;
-  });
+
+  return observable.pipe(tap(() => macroTask.invoke()));
 }

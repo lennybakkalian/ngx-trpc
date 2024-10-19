@@ -2,7 +2,7 @@ import {Component, inject, PLATFORM_ID} from '@angular/core';
 import {AsyncPipe, isPlatformBrowser, JsonPipe} from '@angular/common';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TRPC} from '../app.config';
-import {BehaviorSubject, of, switchMap, tap} from 'rxjs';
+import {startWith, Subject, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-demo-page',
@@ -17,12 +17,15 @@ export class DemoPageComponent {
 
   demoQuery$ = this.trpc.hello.query();
 
-  refreshPosts$ = new BehaviorSubject<void>(undefined);
-  posts$ = this.refreshPosts$.pipe(switchMap(() => this.trpc.listPosts.query()));
+  refreshPosts$ = new Subject<void>();
+  posts$ = this.refreshPosts$.pipe(
+    startWith(null),
+    switchMap(() => this.trpc.listPosts.query())
+  );
 
   addPostTitle = new FormControl('random-post');
 
-  events$ = !this._isBrowser ? of(null) : this.trpc.onPostAdd.subscribe().pipe(tap(console.log));
+  events$ = this.trpc.onPostAdd.subscribe();
 
   addPost() {
     this.trpc.createPost.mutate({title: this.addPostTitle.value!}).subscribe((response) => {

@@ -10,7 +10,7 @@ import {
 } from '@trpc/client';
 import {createChain} from './internals/createChain';
 import {Maybe, TRPCSubscriptionObserver, TRPCType} from './internals/types';
-import {map, Observable as RxJSObservable} from 'rxjs';
+import {map, Observable, Observable as RxJSObservable} from 'rxjs';
 import {waitFor} from '../utils/wait-for';
 
 export class TRPCClient<TRouter extends AnyRouter> {
@@ -23,7 +23,6 @@ export class TRPCClient<TRouter extends AnyRouter> {
 
     this.runtime = {};
 
-    // Initialize the links
     this.links = opts.links.map((link) => link(this.runtime));
   }
 
@@ -33,6 +32,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
     path: string;
     context?: OperationContext;
     signal: Maybe<AbortSignal>;
+    dontWait?: boolean;
   }) {
     const chain$ = createChain<AnyRouter, TInput, TOutput>({
       links: this.links as OperationLink<any, any, any>[],
@@ -46,8 +46,10 @@ export class TRPCClient<TRouter extends AnyRouter> {
     const x = trpcObservableToRxJsObservable<TValue>(chain$.pipe(share())).pipe(
       map((envelope) => envelope.result.data!)
     );
-    waitFor(x);
-    return x;
+    if (opts.dontWait) {
+      return x;
+    }
+    return waitFor(x);
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
@@ -75,12 +77,20 @@ export class TRPCClient<TRouter extends AnyRouter> {
     opts: Partial<TRPCSubscriptionObserver<unknown, TRPCClientError<AnyRouter>>> &
       TRPCRequestOptions
   ) {
+    if (typeof window !== 'object') {
+      return new Observable((subscriber) => {
+        // Subscriptions will just be ignored server side
+        subscriber.complete();
+      });
+    }
+
     return this.$request({
       type: 'subscription',
       path,
       input,
       context: opts?.context,
-      signal: opts?.signal
+      signal: opts?.signal,
+      dontWait: true
     });
   }
 }
