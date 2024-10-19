@@ -13,4 +13,16 @@ export class AppComponent {
   title = 'example';
 
   trpc = inject(TRPC);
+
+  constructor() {
+    /*const x = this.trpc._trpc.message.onPostAdd.subscribe(
+      {},
+      {
+        onData: (data) => {
+          console.log(data);
+        }
+      }
+    );*/
+    this.trpc._trpc.hello.query().then(console.log);
+  }
 }

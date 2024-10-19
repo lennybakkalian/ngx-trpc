@@ -1,6 +1,6 @@
-import {initTRPC, TRPCError} from '@trpc/server';
+import {initTRPC, tracked, TRPCError} from '@trpc/server';
 import {z} from 'zod';
-import EventEmitter from 'node:events';
+import EventEmitter, {on} from 'events';
 import * as trpcExpress from '@trpc/server/adapters/express';
 
 const createContext = ({req, res}: trpcExpress.CreateExpressContextOptions) => {
@@ -57,7 +57,32 @@ const messageRouter = router({
 
     return msg;
   }),
-  listMessages: publicProcedure.query(() => db.messages)
+  listMessages: publicProcedure.query(() => db.messages),
+  onPostAdd: publicProcedure
+    .input(
+      z
+        .object({
+          // lastEventId is the last event id that the client has received
+          // On the first call, it will be whatever was passed in the initial setup
+          // If the client reconnects, it will be the last event id that the client received
+          lastEventId: z.string().nullish()
+        })
+        .optional()
+    )
+    .subscription(async function* (opts) {
+      if (opts.input?.lastEventId) {
+        // [...] get the posts since the last event id and yield them
+      }
+      // listen for new events
+      for await (const [data] of on(ee, 'add', {
+        // Passing the AbortSignal from the request automatically cancels the event emitter when the subscription is aborted
+        signal: opts.signal
+      })) {
+        const post = data as any;
+        // tracking the post id ensures the client can reconnect at any time and get the latest events this id
+        yield tracked(post.id, post);
+      }
+    })
 });
 
 const appRouter = router({

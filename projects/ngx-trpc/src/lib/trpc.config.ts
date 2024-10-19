@@ -13,5 +13,6 @@ export type ITrpcLinkOptions = ITrpcLink & Omit<WebSocketClientOptions, 'url'>;
 
 export interface ITrpcConfig {
   http: ITrpcLink;
+
   ws?: ITrpcLinkOptions;
 }

@@ -1,27 +1,22 @@
 import {inject, PLATFORM_ID} from '@angular/core';
 import {ITrpcConfig} from './trpc.config';
 import {isPlatformBrowser} from '@angular/common';
-import {
-  createTRPCClient,
-  CreateTRPCClient,
-  createWSClient,
-  httpLink,
-  splitLink,
-  TRPCLink,
-  wsLink
-} from '@trpc/client';
+import {createWSClient, httpLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
 import type {AnyRouter} from '@trpc/server';
 import {resolveTrpcLink} from './utils/link-resolver';
+import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/createRxjsClient';
+
+//import {CreateTRPCClient} from './rxjs-proxy/createRxjsClient';
 
 export class TrpcClient<TRouter extends AnyRouter> {
   private _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  private _trpc: CreateTRPCClient<TRouter>;
+  _trpc: CreateTRPCClient<TRouter>;
 
   constructor(private _config: ITrpcConfig) {
     const trpcHttpLink = httpLink<any>({url: resolveTrpcLink(this._isBrowser, this._config.http)});
 
-    let link: TRPCLink<any> = trpcHttpLink;
+    let link: TRPCLink<TRouter> = trpcHttpLink;
 
     if (this._config.ws && this._isBrowser) {
       const wsClient = createWSClient({
@@ -35,7 +30,7 @@ export class TrpcClient<TRouter extends AnyRouter> {
       });
     }
 
-    this._trpc = createTRPCClient<TRouter>({
+    this._trpc = createTRPCRxJSProxyClient({
       links: [link]
     });
   }
