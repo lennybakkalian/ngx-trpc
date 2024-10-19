@@ -15,9 +15,7 @@ export function createChain<TRouter extends AnyRouter, TInput = unknown, TOutput
       const subscription = next({
         op,
         next(nextOp) {
-          const nextObserver = execute(index + 1, nextOp);
-
-          return nextObserver;
+          return execute(index + 1, nextOp);
         }
       });
       return subscription;

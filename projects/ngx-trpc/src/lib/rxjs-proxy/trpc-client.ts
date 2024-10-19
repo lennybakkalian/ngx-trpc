@@ -1,4 +1,5 @@
 import {AnyRouter} from '@trpc/server';
+import {inferObservableValue, Observable as TrpcObservable, share} from '@trpc/server/observable';
 import {
   CreateTRPCClientOptions,
   OperationContext,
@@ -7,9 +8,9 @@ import {
   TRPCClientRuntime,
   TRPCRequestOptions
 } from '@trpc/client';
-import {inferObservableValue, observableToPromise, share} from '@trpc/server/observable';
 import {createChain} from './internals/createChain';
 import {Maybe, TRPCType} from './internals/types';
+import {map, Observable as RxJSObservable} from 'rxjs';
 
 export class TRPCClient<TRouter extends AnyRouter> {
   private readonly links: OperationLink<TRouter>[];
@@ -40,10 +41,42 @@ export class TRPCClient<TRouter extends AnyRouter> {
         id: ++this.requestId
       }
     });
-    return chain$.pipe(share());
+    type TValue = inferObservableValue<typeof chain$>;
+    return trpcObservableToRxJsObservable<TValue>(chain$.pipe(share())).pipe(
+      map((envelope) => envelope.result.data!)
+    );
   }
 
-  private async requestAsPromise<TInput = unknown, TOutput = unknown>(opts: {
+  private requestAsPromise<TInput = unknown, TOutput = unknown>(opts: {
+    type: TRPCType;
+    input: TInput;
+    path: string;
+    context?: OperationContext;
+    signal: Maybe<AbortSignal>;
+  }): RxJSObservable<TOutput> {
+    return this.$request<TInput, TOutput>(opts);
+  }
+
+  public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
+    return this.requestAsPromise<unknown, unknown>({
+      type: 'query',
+      path,
+      input,
+      context: opts?.context,
+      signal: opts?.signal
+    });
+  }
+  public mutation(path: string, input?: unknown, opts?: TRPCRequestOptions) {
+    return this.requestAsPromise<unknown, unknown>({
+      type: 'mutation',
+      path,
+      input,
+      context: opts?.context,
+      signal: opts?.signal
+    });
+  }
+
+  /*private async requestAsPromise<TInput = unknown, TOutput = unknown>(opts: {
     type: TRPCType;
     input: TInput;
     path: string;
@@ -78,7 +111,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
       context: opts?.context,
       signal: opts?.signal
     });
-  }
+  }*/
   /*public subscription(
     path: string,
     input: unknown,
@@ -112,4 +145,19 @@ export class TRPCClient<TRouter extends AnyRouter> {
       }
     });
   }*/
+}
+
+function trpcObservableToRxJsObservable<TValue>(
+  observable: TrpcObservable<TValue, unknown>
+): RxJSObservable<TValue> {
+  return new RxJSObservable<TValue>((subscriber) => {
+    const sub = observable.subscribe({
+      next: (value) => subscriber.next(value),
+      error: (err) => subscriber.error(TRPCClientError.from(err as Error)),
+      complete: () => subscriber.complete()
+    });
+    return () => {
+      sub.unsubscribe();
+    };
+  });
 }

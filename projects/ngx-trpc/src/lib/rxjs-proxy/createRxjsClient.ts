@@ -14,6 +14,7 @@ import {createFlatProxy, createRecursiveProxy} from '@trpc/server/unstable-core-
 import {TRPCClient} from './trpc-client';
 import {UntypedClientProperties} from './internals/types';
 import {CreateTRPCClientOptions} from '@trpc/client';
+import {Observable as RxJSObservable} from 'rxjs';
 
 /**
  * @public
@@ -34,7 +35,7 @@ type ResolverDef = {
 export type Resolver<TDef extends ResolverDef> = (
   input: TDef['input'],
   opts?: ProcedureOptions
-) => Promise<TDef['output']>;
+) => RxJSObservable<TDef['output']>;
 
 /*type SubscriptionResolver<TDef extends ResolverDef> = (
   input: TDef['input'],
