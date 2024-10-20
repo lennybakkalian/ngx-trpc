@@ -1,15 +1,7 @@
 <div class="demo-container">
-  query:
-  <pre>{{ (demoQuery$ | async) ?? 'loading'}}</pre>
-</div>
+  simple query from server:
 
-<div class="demo-container">
-  post list:
-  <pre>
-    @for (post of posts$ | async; track post.id) {
-      {{ post.title }}
-    }
-  </pre>
+  <pre>{{ (demoQuery$ | async) ?? 'loading'}}</pre>
 </div>
 
 <div>
@@ -17,7 +9,20 @@
   <button (click)="addPost()">Add Post</button>
 </div>
 
+<div class="demo-container" style="flex-direction:column">
+  post list that gets queried after mutation
+  <pre>
+    @for (post of posts$ | async; track post.id) {
+      {{ post.title }}
+    }
+  </pre>
+</div>
+
 <div class="demo-container" style="flex-direction:column;align-items:flex-start;margin-top:30px">
-  latest event:
-  <pre>{{(events$ | async) | json}}</pre>
+  subscribed posts:
+  @if (events$ | async; as events) {
+    <pre>{{events | json}}</pre>
+  } @else {
+    <small>connecting...</small>
+  }
 </div>

@@ -11,7 +11,6 @@ interface Post {
 
 export const createContext = (opts: CreateExpressContextOptions | CreateWSSContextFnOptions) => {
   const {req} = opts;
-  console.log(req.headers);
 
   return {};
 };

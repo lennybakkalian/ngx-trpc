@@ -1,5 +1,5 @@
 import {InjectionToken, PLATFORM_ID, Provider, TransferState} from '@angular/core';
-import {ITrpcConfig} from './trpc.config';
+import {ITrpcConfig, provideTrpcConfig} from './trpc.config';
 import {AnyRouter} from '@trpc/server';
 import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/createRxjsClient';
 import {createWSClient, httpLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
@@ -24,6 +24,7 @@ export function provideTrpc<AppRouter extends AnyRouter>(
   config: ITrpcConfig
 ): Provider[] {
   return [
+    provideTrpcConfig(config),
     provideTrpcCacheState(),
     provideTrpcCacheStateStatusManager(),
     {

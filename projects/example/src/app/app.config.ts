@@ -17,7 +17,10 @@ export const appConfig: ApplicationConfig = {
 
     provideHttpClient(withFetch()),
     provideTrpc(TRPC, {
-      http: {url: 'http://localhost:4444/trpc'},
+      http: {
+        url: 'http://localhost:4444/trpc',
+        withCredentials: true
+      },
       ws: {
         url: 'ws://localhost:4444',
         lazy: {enabled: true, closeMs: 10_000}

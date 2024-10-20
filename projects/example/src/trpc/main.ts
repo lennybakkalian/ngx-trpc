@@ -8,7 +8,7 @@ import cors from 'cors';
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+app.use(cors({origin: true, credentials: true}));
 
 const wss = new WebSocketServer({server});
 applyWSSHandler<AppRouter>({

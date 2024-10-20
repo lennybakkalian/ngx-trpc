@@ -1,8 +1,8 @@
-import {Component, inject, PLATFORM_ID} from '@angular/core';
-import {AsyncPipe, isPlatformBrowser, JsonPipe} from '@angular/common';
+import {Component, inject} from '@angular/core';
+import {AsyncPipe, JsonPipe} from '@angular/common';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TRPC} from '../app.config';
-import {startWith, Subject, switchMap} from 'rxjs';
+import {filter, scan, startWith, Subject, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-demo-page',
@@ -11,8 +11,6 @@ import {startWith, Subject, switchMap} from 'rxjs';
   templateUrl: './demo-page.component.html'
 })
 export class DemoPageComponent {
-  private _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-
   readonly trpc = inject(TRPC);
 
   demoQuery$ = this.trpc.hello.query();
@@ -25,12 +23,17 @@ export class DemoPageComponent {
 
   addPostTitle = new FormControl('random-post');
 
-  events$ = this.trpc.onPostAdd.subscribe({lastEventId: '1'});
+  events$ = this.trpc.onPostAdd.subscribe().pipe(
+    filter((v) => !!v),
+    scan((acc, event) => [...acc, event], [] as any[])
+  );
 
   addPost() {
-    this.trpc.createPost.mutate({title: this.addPostTitle.value!}).subscribe((response) => {
-      this.refreshPosts$.next();
-      console.log({response});
-    });
+    this.trpc.createPost
+      .mutate({title: this.addPostTitle.value!})
+      .subscribe((mutation_response) => {
+        this.refreshPosts$.next();
+        console.log({mutation_response});
+      });
   }
 }
