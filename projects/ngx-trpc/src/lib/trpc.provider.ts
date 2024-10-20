@@ -11,7 +11,7 @@ import {
   tRPC_CACHE_STATE
 } from './utils/cache-state';
 import {transferStateLink} from './utils/transfer-state-link';
-import {provideCustomFetch} from './utils/fetch-http-client';
+import {FetchHttpClient} from './utils/fetch-http-client';
 
 type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
 
@@ -26,15 +26,13 @@ export function provideTrpc<AppRouter extends AnyRouter>(
   return [
     provideTrpcCacheState(),
     provideTrpcCacheStateStatusManager(),
-    provideCustomFetch(),
     {
       provide: token,
-      useFactory: (platformId: Object) => {
+      useFactory: (fetchHttpClient: FetchHttpClient, platformId: Object) => {
         const _isBrowser = isPlatformBrowser(platformId);
-
         const trpcHttpLink = httpLink<any>({
           url: resolveTrpcLink(_isBrowser, config.http),
-          fetch: (input, init) => fetch(input, init)
+          fetch: fetchHttpClient.fetch.bind(fetchHttpClient)
         });
 
         let link: TRPCLink<AnyRouter> = trpcHttpLink;
@@ -56,7 +54,7 @@ export function provideTrpc<AppRouter extends AnyRouter>(
           links: [transferStateLink(), link]
         });
       },
-      deps: [PLATFORM_ID, tRPC_CACHE_STATE, TransferState]
+      deps: [FetchHttpClient, PLATFORM_ID, tRPC_CACHE_STATE, TransferState]
     }
   ];
 }

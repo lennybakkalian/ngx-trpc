@@ -1,22 +1,22 @@
 import {HttpClient} from '@angular/common/http';
-import {Provider} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
+import {REQUEST} from '@angular/ssr';
 
 interface FetchImpl {
   fetch: typeof fetch;
 }
 
+@Injectable({providedIn: 'root'})
 export class FetchHttpClient implements FetchImpl {
-  constructor(private _http: HttpClient) {}
+  private _http = inject(HttpClient);
+  private _request = inject(REQUEST, {optional: true});
+
+  constructor() {
+    console.log('init', this._http, this._request);
+  }
 
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    console.log(input, this._request);
     return fetch(input, init);
   }
-}
-
-export function provideCustomFetch(): Provider {
-  return {
-    provide: FetchHttpClient,
-    useFactory: (http: HttpClient) => new FetchHttpClient(http),
-    deps: [HttpClient]
-  };
 }
