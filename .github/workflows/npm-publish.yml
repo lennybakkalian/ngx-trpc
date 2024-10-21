@@ -1,38 +1,32 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
-name: Publish Library
+name: Release to NPM
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'projects/ngx-trpc/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
+  release:
+    types: [published]
 
 jobs:
-  build-and-publish:
+  release:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
+
+      - name: Use Node LTS ✨
+        uses: actions/setup-node@v4
         with:
-          version: 9
-          run_install: false
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
 
-      - name: Install dependencies with pnpm
-        run: pnpm install
+      - name: Install dependencies 📦️
+        run: pnpm install --frozen-lockfile
 
-      - name: Build Angular Library
+      - name: Build 🔨
         run: pnpm ng build ngx-trpc
 
-      - name: Publish to npm
+      - name: Publish 🚀
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
