@@ -9,15 +9,16 @@
     "Trpc"
   ],
   "peerDependencies": {
-    "@angular/common": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/ssr": "^19.0.0",
-    "@trpc/client": "^11.0.0",
-    "@trpc/server": "^11.0.0",
-    "rxjs": "^7.8.1"
+    "@angular/common": ">=19.0.0",
+    "@angular/core": ">=19.0.0",
+    "@angular/ssr": ">=19.0.0",
+    "rxjs": ">=7.8.0"
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "superjson": "^2.2.1",
+    "@trpc/client": "^11.0.0-rc.586",
+    "@trpc/server": "^11.0.0-rc.586"
   },
   "sideEffects": false,
   "publishConfig": {

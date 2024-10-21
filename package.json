@@ -1,6 +1,8 @@
 {
   "name": "angular-trpc",
   "version": "0.0.0",
+  "homepage": "",
+  "license": "MIT",
   "scripts": {
     "serve:demo": "ng serve",
     "serve:demo:trpc": "bun run --watch projects/example/src/trpc/main.ts",
@@ -69,8 +71,8 @@
       [
         "@semantic-release/git",
         {
-          "assets": ["dist/ngx-trpc/package.json"],
-          "message": "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
+          "assets": ["dist/ngx-trpc/package.json", "README.md"],
+          "message": "chore(release): ${nextRelease.version} \uD83C\uDF89 \n\n${nextRelease.notes}"
         }
       ],
       "@semantic-release/github"
