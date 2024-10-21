@@ -37,6 +37,8 @@ jobs:
         run: pnpm audit signatures
       - name: Build
         run: pnpm build
+      - name: cp README.md
+        run: cp README.md dist/ngx-trpc/README.md
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
