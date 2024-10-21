@@ -26,6 +26,8 @@ This project was inspired by the amazing work of [`@analogjs/trpc`](https://gith
 
 ## Disclaimer ⚠️
 
+Since the REQUEST token is [reintroduced](https://github.com/angular/angular-cli/pull/28463) in v19, this library is compatible only with that version.
+
 This project is a **work in progress**. Features and APIs may change as development continues. Use at your own risk, and expect frequent updates. Contributions and feedback are always welcome!
 
 ---
