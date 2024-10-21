@@ -4,7 +4,10 @@
   "repository": "https://github.com/lennybakkalian/ngx-trpc",
   "description": "Angular integration for tRPC",
   "version": "0.0.1",
-  "keywords": ["Angular", "Trpc"],
+  "keywords": [
+    "Angular",
+    "Trpc"
+  ],
   "peerDependencies": {
     "@angular/common": "^19.0.0",
     "@angular/core": "^19.0.0",
