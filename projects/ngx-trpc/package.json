@@ -1,5 +1,5 @@
 {
-  "name": "ngx-trpc",
+  "name": "@lennybakkalian/ngx-trpc",
   "author": "Lenny Bakkalian",
   "repository": "https://github.com/lennybakkalian/ngx-trpc",
   "description": "Angular integration for tRPC",
@@ -19,5 +19,8 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  }
 }

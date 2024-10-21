@@ -9,7 +9,6 @@
   "engines": {
     "node": ">=v20.17.0"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^19.0.0-next.10",
     "@angular/common": "^19.0.0-next.10",
