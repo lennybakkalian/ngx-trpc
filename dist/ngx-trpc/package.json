@@ -1,0 +1,38 @@
+{
+  "name": "@lennybakkalian/ngx-trpc",
+  "author": "Lenny Bakkalian",
+  "repository": "https://github.com/lennybakkalian/ngx-trpc",
+  "description": "Angular integration for tRPC",
+  "version": "1.0.1",
+  "keywords": [
+    "Angular",
+    "Trpc"
+  ],
+  "peerDependencies": {
+    "@angular/common": ">=19.0.0",
+    "@angular/core": ">=19.0.0",
+    "@angular/ssr": ">=19.0.0",
+    "rxjs": ">=7.8.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "superjson": "^2.2.1",
+    "@trpc/client": "^11.0.0-rc.586",
+    "@trpc/server": "^11.0.0-rc.586"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "module": "fesm2022/lennybakkalian-ngx-trpc.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./fesm2022/lennybakkalian-ngx-trpc.mjs"
+    }
+  }
+}
