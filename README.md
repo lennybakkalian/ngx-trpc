@@ -19,12 +19,6 @@
 
 This project was inspired by the amazing work of [`Dafnik/ngx-trpc`](https://github.com/Dafnik/ngx-trpc) and [`@analogjs/trpc`](https://github.com/analogjs/analog/tree/main/packages/trpc). It builds upon the same principles of type-safe API communication and seamless Angular integration, with added features such as WebSocket subscriptions.
 
-## TODOs 📝
-
-- [ ] Additional Unit Tests for SSR and WebSocket Subscriptions.
-- [ ] Improve Error Handling and Logging.
-- [ ] Handle subscriptions server-side. Currently, subscriptions are only supported client-side.
-
 ## Disclaimer ⚠️
 
 Since the REQUEST token is [reintroduced](https://github.com/angular/angular-cli/pull/28463) in v19, this library is compatible only with that version.
@@ -86,3 +80,9 @@ provideTrpc(TRPC, {
   }
 })
 ```
+
+## TODOs 📝
+
+- [ ] Additional Unit Tests for SSR and WebSocket Subscriptions.
+- [ ] Improve Error Handling and Logging.
+- [ ] Handle subscriptions server-side. Currently, subscriptions are only supported client-side.

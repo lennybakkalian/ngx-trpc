@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import {AsyncPipe, JsonPipe} from '@angular/common';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {TRPC} from '../app.config';
-import {filter, scan, startWith, Subject, switchMap} from 'rxjs';
+import {scan, startWith, Subject, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-demo-page',
@@ -23,10 +23,9 @@ export class DemoPageComponent {
 
   addPostTitle = new FormControl('random-post');
 
-  events$ = this.trpc.onPostAdd.subscribe().pipe(
-    filter((v) => !!v),
-    scan((acc, event) => [...acc, event], [] as any[])
-  );
+  events$ = this.trpc.onPostAdd
+    .subscribe()
+    .pipe(scan((acc, event) => [...acc, event], [] as any[]));
 
   addPost() {
     this.trpc.createPost

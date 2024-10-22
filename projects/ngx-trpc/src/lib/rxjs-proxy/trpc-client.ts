@@ -1,15 +1,16 @@
 import {AnyRouter} from '@trpc/server';
-import {inferObservableValue, Observable as TrpcObservable, share} from '@trpc/server/observable';
+import {Observable as TrpcObservable, share} from '@trpc/server/observable';
 import {
   CreateTRPCClientOptions,
   OperationContext,
   OperationLink,
+  OperationResultEnvelope,
   TRPCClientError,
   TRPCClientRuntime,
   TRPCRequestOptions
 } from '@trpc/client';
 import {Maybe, TRPCSubscriptionObserver, TRPCType} from './types';
-import {map, Observable, Observable as RxJSObservable} from 'rxjs';
+import {Observable, Observable as RxJSObservable} from 'rxjs';
 import {waitFor} from '../utils/wait-for';
 import {createChain} from './createChain';
 
@@ -42,14 +43,9 @@ export class TRPCClient<TRouter extends AnyRouter> {
         id: ++this.requestId
       }
     });
-    type TValue = inferObservableValue<typeof chain$>;
-    const x = trpcObservableToRxJsObservable<TValue>(chain$.pipe(share())).pipe(
-      map((envelope) => envelope.result.data!)
-    );
-    if (opts.dontWait) {
-      return x;
-    }
-    return waitFor(x);
+    const result = trpcObservableToRxJsObservable(chain$.pipe(share()));
+
+    return opts.dontWait ? result : waitFor(result);
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
@@ -95,17 +91,31 @@ export class TRPCClient<TRouter extends AnyRouter> {
   }
 }
 
-function trpcObservableToRxJsObservable<TValue>(
-  observable: TrpcObservable<TValue, unknown>
-): RxJSObservable<TValue> {
-  return new RxJSObservable<TValue>((subscriber) => {
+function trpcObservableToRxJsObservable<TOutput>(
+  observable: TrpcObservable<
+    OperationResultEnvelope<TOutput, TRPCClientError<AnyRouter>>,
+    TRPCClientError<AnyRouter>
+  >
+): RxJSObservable<TOutput> {
+  return new RxJSObservable<TOutput>((subscriber) => {
     const sub = observable.subscribe({
-      next: (value) => subscriber.next(value),
-      error: (err) => subscriber.error(TRPCClientError.from(err as Error)),
+      next: (value) => {
+        switch (value.result.type) {
+          case 'data':
+            subscriber.next(value.result.data);
+            break;
+          case 'state': // todo
+            break;
+          case 'started': // todo
+            break;
+          case 'stopped':
+            subscriber.complete();
+            break;
+        }
+      },
+      error: (err) => subscriber.error(err),
       complete: () => subscriber.complete()
     });
-    return () => {
-      sub.unsubscribe();
-    };
+    return () => sub.unsubscribe();
   });
 }

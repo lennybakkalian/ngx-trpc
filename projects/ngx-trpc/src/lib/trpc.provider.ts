@@ -13,7 +13,7 @@ import {
 import {transferStateLink} from './utils/transfer-state-link';
 import {FetchHttpClient} from './utils/fetch-http-client';
 
-type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
+export type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
 
 export function createTrpcInjectionToken<T extends AnyRouter>() {
   return new InjectionToken<TrpcClient<T>>('TrpcClient');

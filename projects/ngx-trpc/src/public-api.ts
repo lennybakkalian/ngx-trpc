@@ -1,1 +1,1 @@
-export * from './lib/trpc.provider';
+export {type TrpcClient, provideTrpc, createTrpcInjectionToken} from './lib/trpc.provider';
