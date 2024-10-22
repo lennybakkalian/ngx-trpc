@@ -13,10 +13,11 @@
 - [Server Side Rendering](#server-side-rendering)
 - [TODOs](#todos-)
 - [Disclaimer](#disclaimer-)
+- [Example Implementation](https://github.com/lennybakkalian/ngx-trpc/tree/main/projects/example)
 
 ## Inspiration 💡
 
-This project was inspired by the amazing work of [`@analogjs/trpc`](https://github.com/analogjs/analog/tree/main/packages/trpc). It builds upon the same principles of type-safe API communication and seamless Angular integration, with added features such as WebSocket subscriptions.
+This project was inspired by the amazing work of [`Dafnik/ngx-trpc`](https://github.com/Dafnik/ngx-trpc) and [`@analogjs/trpc`](https://github.com/analogjs/analog/tree/main/packages/trpc). It builds upon the same principles of type-safe API communication and seamless Angular integration, with added features such as WebSocket subscriptions.
 
 ## TODOs 📝
 
@@ -33,6 +34,12 @@ This project is a **work in progress**. Features and APIs may change as developm
 ---
 
 ## Getting Started 🚀
+
+To start using the Angular tRPC Client in your project, install it via npm:
+
+```bash
+npm i ngx-trpc
+```
 
 ### Step 1: Create a Global Injection Token
 
