@@ -1,8 +1,8 @@
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
-import {REQUEST} from '@angular/ssr';
 import {firstValueFrom} from 'rxjs';
 import {TRPC_CONFIG} from '../trpc.config';
+import {REQUEST} from '@angular/ssr';
 
 interface FetchImpl {
   fetch: typeof fetch;
@@ -25,7 +25,7 @@ export class FetchHttpClient implements FetchImpl {
     let headers = new HttpHeaders(init?.headers as {[header: string]: string});
 
     if (this._request) {
-      this._request.headers.forEach((value, key) => {
+      this._request.headers.forEach((value: string, key: string) => {
         headers = headers.set(key, value);
       });
     }

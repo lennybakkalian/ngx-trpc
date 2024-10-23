@@ -59,20 +59,26 @@
     "typescript": "~5.6.2"
   },
   "release": {
-    "branches": ["main"],
+    "branches": [
+      "main"
+    ],
     "repositoryUrl": "https://github.com/lennybakkalian/ngx-trpc.git",
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       [
         "@semantic-release/npm",
-        {"pkgRoot":  "dist/ngx-trpc"}
+        {
+          "pkgRoot": "dist/ngx-trpc"
+        }
       ],
       [
         "@semantic-release/git",
         {
-          "assets": ["dist/ngx-trpc/package.json"],
-          "message": "chore(release): ${nextRelease.version} \uD83C\uDF89 \n\n${nextRelease.notes}"
+          "assets": [
+            "dist/ngx-trpc/package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} 🎉 \n\n${nextRelease.notes}"
         }
       ],
       "@semantic-release/github"
