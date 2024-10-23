@@ -3,7 +3,6 @@ import {ITrpcConfig, provideTrpcConfig} from './trpc.config';
 import {AnyRouter} from '@trpc/server';
 import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/createRxjsClient';
 import {createWSClient, httpLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
-import {getPlatformConfig} from './utils/link-resolver';
 import {isPlatformBrowser} from '@angular/common';
 import {
   provideTrpcCacheState,
@@ -12,6 +11,7 @@ import {
 } from './utils/cache-state';
 import {transferStateLink} from './utils/transfer-state-link';
 import {FetchHttpClient} from './utils/fetch-http-client';
+import {getPlatformConfig} from './utils/get-platform-config';
 
 export type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
 
