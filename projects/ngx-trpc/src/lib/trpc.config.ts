@@ -8,25 +8,35 @@ export const provideTrpcConfig = (config: ITrpcConfig): Provider => ({
   useValue: config
 });
 
-export interface ITrpcLink {
+type HttpOptions = {
   url: string;
+};
 
-  /**
-   * URL that will be used server-side.
-   */
-  ssrUrl?: string;
-
-  /**
-   * If TRPC is hosted on a different domain than the frontend, you can set this to `true` to send cookies with the request.
-   * Please adjust the `Access-Control-Allow-Origin` header on the server to allow credentials.
-   */
-  withCredentials?: boolean;
-}
-
-export type ITrpcLinkOptions = ITrpcLink & Omit<WebSocketClientOptions, 'url'>;
+type WsOptions = {
+  url: string;
+} & Omit<WebSocketClientOptions, 'url'>;
 
 export interface ITrpcConfig {
-  http: ITrpcLink;
+  http: HttpOptions & {withCredentials?: boolean};
 
-  ws?: ITrpcLinkOptions;
+  ws?: WsOptions;
+
+  ssr?: {
+    /**
+     * Overwrite http options in SSR context.
+     */
+    http?: HttpOptions;
+
+    /**
+     * Overwrite ws options in SSR context.
+     */
+    // ws?: WsOptions; // Not supported yet
+
+    /**
+     * Define all headers that should be forwarded to the client.
+     *
+     * Default: `['set-cookie']`
+     */
+    forwardHeaders?: string[];
+  };
 }
