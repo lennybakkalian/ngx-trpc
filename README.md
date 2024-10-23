@@ -40,25 +40,25 @@ npm i ngx-trpc
 First, define a global injection token using the `AppRouter` type from your tRPC backend. This will allow you to inject your tRPC client throughout your Angular app.
 
 ```typescript
+import { createTrpcInjectionToken } from 'ngx-trpc';
+
 export const TRPC = createTrpcInjectionToken<AppRouter>();
 ```
 
 ### Step 2: Add tRPC Configuration to app.config.ts
-Next, provide the tRPC client and httpClient in your `app.config.ts` file.
+Next, provide the tRPC client and httpClient in your `app.config.ts` file. ([example](./projects/example/src/app/app.config.ts))
 ```typescript
-provideHttpClient(withFetch()),
-provideTrpc(TRPC, {
-  http: { url: 'http://localhost:4444/trpc' },
-  ws: {
-    url: 'ws://localhost:4444',
-    lazy: { enabled: true, closeMs: 10_000 },
-  },
-})
+import { provideTrpc } from 'ngx-trpc';
+
+provideHttpClient(withFetch())
+provideTrpc(TRPC, { options })
 ```
 
 ### Step 3: Use Queries as RxJS Observables in Components
 You can now use the TRPC injection token to call tRPC queries as RxJS observables inside your components. Here's an example of how to call the hello query.
 ```typescript
+import { TRPC } from '../path/to/injection-token';
+
 @Component({
   selector: 'app-demo',
   template: '{{ demoQuery$ | async | json }}',
@@ -68,17 +68,6 @@ export class DemoComponent {
   
   readonly demoQuery$ = this.trpc.hello.query();
 }
-```
-
-## Server Side Rendering
-You can use different link configurations for server-side. So you can directly connect to the backend.
-```typescript
-provideTrpc(TRPC, {
-  http: {
-    url: 'https://api.example.com/trpc',
-    ssrUrl: 'http://backend_host:4444/trpc' // <-- Add this line. This host will be used on the server
-  }
-})
 ```
 
 ## TODOs 📝

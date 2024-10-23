@@ -2,7 +2,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
 import {firstValueFrom} from 'rxjs';
 import {TRPC_CONFIG} from '../trpc.config';
-import {REQUEST} from '@angular/ssr';
+import {REQUEST, RESPONSE_INIT} from '@angular/ssr';
 
 interface FetchImpl {
   fetch: typeof fetch;
@@ -12,6 +12,7 @@ interface FetchImpl {
 export class FetchHttpClient implements FetchImpl {
   private _http = inject(HttpClient);
   private _request = inject(REQUEST, {optional: true});
+  private _response = inject(RESPONSE_INIT, {optional: true});
   private _trpcConfig = inject(TRPC_CONFIG);
 
   async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
@@ -39,10 +40,24 @@ export class FetchHttpClient implements FetchImpl {
         withCredentials: this._trpcConfig.http.withCredentials
       })
     );
+    const convertedHeaders = this._convertHeaders(res.headers);
+
+    const forwardHeaders = this._trpcConfig.ssr?.forwardHeaders || ['set-cookie'];
+    if (this._response && this._response.headers instanceof Headers) {
+      const responseHeaders: Headers = this._response.headers;
+
+      forwardHeaders.forEach((header) => {
+        const value = convertedHeaders.get(header);
+        if (value) {
+          responseHeaders.set(header, value);
+        }
+      });
+    }
+
     return new Response(res.body as Blob, {
       status: res.status,
       statusText: res.statusText,
-      headers: this._convertHeaders(res.headers)
+      headers: convertedHeaders
     });
   }
 

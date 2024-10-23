@@ -1,5 +1,10 @@
-import {ITrpcLink} from '../trpc.config';
+import {IObject, merge} from '../libs/ts-deepmerge';
 
-export function resolveTrpcLink(isServer: boolean, urls: ITrpcLink): string {
-  return isServer ? urls.ssrUrl || urls.url : urls.url;
+export function getPlatformConfig<A extends IObject, B extends IObject | undefined>(
+  isServer: boolean,
+  config: A,
+  serverConfig: B
+) {
+  if (!serverConfig) return config;
+  return isServer ? merge(config, serverConfig) : config;
 }

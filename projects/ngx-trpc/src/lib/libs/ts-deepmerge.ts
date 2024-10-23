@@ -43,7 +43,7 @@ const isObject = (obj: any) => {
   return false;
 };
 
-interface IObject {
+export interface IObject {
   [key: string]: any;
 }
 
