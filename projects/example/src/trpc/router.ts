@@ -36,6 +36,7 @@ export const appRouter = router({
     return post;
   }),
   listPosts: publicProcedure.query(() => db),
+  login: publicProcedure.query(() => true), // just for demo purposes. Don't do this in production ;)
   onPostAdd: publicProcedure
     .input(
       z
