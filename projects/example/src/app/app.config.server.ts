@@ -3,10 +3,7 @@ import {provideServerRendering} from '@angular/platform-server';
 import {appConfig} from './app.config';
 
 const serverConfig: ApplicationConfig = {
-  providers: [
-    provideServerRendering()
-    //provideServerRoutesConfig(serverRoutes)
-  ]
+  providers: [provideServerRendering()]
 };
 
 export const config = mergeApplicationConfig(appConfig, serverConfig);
