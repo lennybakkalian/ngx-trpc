@@ -23,3 +23,5 @@ export interface TRPCSubscriptionObserver<TValue, TError> {
   onStopped: () => void;
   onComplete: () => void;
 }
+
+export type YieldType<T> = T extends AsyncGenerator<infer Y, any, any> ? Y : never;
