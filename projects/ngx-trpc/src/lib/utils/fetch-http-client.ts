@@ -17,8 +17,7 @@ export class FetchHttpClient implements FetchImpl {
 
   async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     if (typeof input != 'string') {
-      // TRPC only uses a url, but this could be changed later. todo: improve this
-      throw new Error('fetch input must be a string');
+      throw new Error('[ngx-trpc] Only string urls are supported right now.');
     }
 
     const url = input;

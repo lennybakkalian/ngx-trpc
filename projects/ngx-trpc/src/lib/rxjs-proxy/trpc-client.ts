@@ -1,5 +1,5 @@
 import {AnyRouter} from '@trpc/server';
-import {Observable as TrpcObservable} from '@trpc/server/observable';
+import {Observable as TrpcObservable, share} from '@trpc/server/observable';
 import {
   CreateTRPCClientOptions,
   OperationContext,
@@ -11,7 +11,7 @@ import {
 } from '@trpc/client';
 import {Maybe, TRPCSubscriptionObserver, TRPCType} from './types';
 import {Observable, Observable as RxJSObservable} from 'rxjs';
-import {createChain} from './createChain';
+import {createChain} from './create-chain';
 import {MacroTask} from '../utils/macro-task';
 import {toSignal} from '@angular/core/rxjs-interop';
 
@@ -46,7 +46,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
       }
     });
 
-    return trpcObservableToRxJsObservable(opts, chain$);
+    return trpcObservableToRxJsObservable(opts, chain$.pipe(share()));
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
