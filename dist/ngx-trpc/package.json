@@ -3,7 +3,7 @@
   "author": "Lenny Bakkalian",
   "repository": "https://github.com/lennybakkalian/ngx-trpc",
   "description": "Angular integration for tRPC",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "keywords": [
     "Angular",
     "Trpc"
