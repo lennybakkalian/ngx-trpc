@@ -1,5 +1,5 @@
 import {AnyRouter} from '@trpc/server';
-import {Observable as TrpcObservable, share} from '@trpc/server/observable';
+import {Observable as TrpcObservable} from '@trpc/server/observable';
 import {
   CreateTRPCClientOptions,
   OperationContext,
@@ -46,7 +46,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
       }
     });
 
-    return trpcObservableToRxJsObservable(opts, chain$.pipe(share()));
+    return trpcObservableToRxJsObservable(opts, chain$);
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
@@ -59,16 +59,8 @@ export class TRPCClient<TRouter extends AnyRouter> {
     });
   }
 
-  public createSignal(path: string, input?: unknown, opts?: TRPCRequestOptions) {
-    return toSignal(
-      this.$request({
-        type: 'query',
-        path,
-        input,
-        context: opts?.context,
-        signal: opts?.signal
-      })
-    );
+  public querySignal(path: string, input?: unknown, opts?: TRPCRequestOptions) {
+    return toSignal(this.query(path, input, opts));
   }
 
   public mutation(path: string, input?: unknown, opts?: TRPCRequestOptions) {
@@ -102,6 +94,15 @@ export class TRPCClient<TRouter extends AnyRouter> {
       signal: opts?.signal
     });
   }
+
+  public subscriptionSignal(
+    path: string,
+    input: unknown,
+    opts: Partial<TRPCSubscriptionObserver<unknown, TRPCClientError<AnyRouter>>> &
+      TRPCRequestOptions
+  ) {
+    return toSignal(this.subscription(path, input, opts));
+  }
 }
 
 function trpcObservableToRxJsObservable<TInput, TOutput>(
@@ -112,9 +113,9 @@ function trpcObservableToRxJsObservable<TInput, TOutput>(
   >
 ): RxJSObservable<TOutput> {
   return new RxJSObservable<TOutput>((subscriber) => {
-    // create a macroTask as long as the observable is not a subscription
+    // create a macroTask as long as the request type is not a subscription
     // it will be invoked on data or errors
-    const macroTask = new MacroTask(opts.type !== 'subscription');
+    const macroTask = new MacroTask(opts.type !== 'subscription', opts.path);
 
     const sub = observable.subscribe({
       next: (value) => {
@@ -132,8 +133,14 @@ function trpcObservableToRxJsObservable<TInput, TOutput>(
             break;
         }
       },
-      error: (err) => subscriber.error(err),
-      complete: () => subscriber.complete()
+      error: (err) => {
+        subscriber.error(err);
+        macroTask.invoke();
+      },
+      complete: () => {
+        subscriber.complete();
+        macroTask.invoke();
+      }
     });
     return () => sub.unsubscribe();
   });
