@@ -11,8 +11,16 @@ import {
 } from '@trpc/client';
 import {Maybe, TRPCSubscriptionObserver, TRPCType} from './types';
 import {Observable, Observable as RxJSObservable} from 'rxjs';
-import {waitFor} from '../utils/wait-for';
 import {createChain} from './createChain';
+import {MacroTask} from '../utils/macro-task';
+
+interface RequestOpts<TInput> {
+  type: TRPCType;
+  input: TInput;
+  path: string;
+  context?: OperationContext;
+  signal: Maybe<AbortSignal>;
+}
 
 export class TRPCClient<TRouter extends AnyRouter> {
   private readonly links: OperationLink<TRouter>[];
@@ -27,14 +35,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
     this.links = opts.links.map((link) => link(this.runtime));
   }
 
-  private $request<TInput = unknown, TOutput = unknown>(opts: {
-    type: TRPCType;
-    input: TInput;
-    path: string;
-    context?: OperationContext;
-    signal: Maybe<AbortSignal>;
-    dontWait?: boolean;
-  }) {
+  private $request<TInput = unknown, TOutput = unknown>(opts: RequestOpts<TInput>) {
     const chain$ = createChain<AnyRouter, TInput, TOutput>({
       links: this.links as OperationLink<any, any, any>[],
       op: {
@@ -43,9 +44,8 @@ export class TRPCClient<TRouter extends AnyRouter> {
         id: ++this.requestId
       }
     });
-    const result = trpcObservableToRxJsObservable(chain$.pipe(share()));
 
-    return opts.dontWait ? result : waitFor(result);
+    return trpcObservableToRxJsObservable(opts, chain$.pipe(share()));
   }
 
   public query(path: string, input?: unknown, opts?: TRPCRequestOptions) {
@@ -75,7 +75,7 @@ export class TRPCClient<TRouter extends AnyRouter> {
   ) {
     if (typeof window !== 'object') {
       return new Observable((subscriber) => {
-        // Subscriptions will just be ignored server side
+        // subscriptions will just be completed in ssr context
         subscriber.complete();
       });
     }
@@ -85,24 +85,29 @@ export class TRPCClient<TRouter extends AnyRouter> {
       path,
       input,
       context: opts?.context,
-      signal: opts?.signal,
-      dontWait: true
+      signal: opts?.signal
     });
   }
 }
 
-function trpcObservableToRxJsObservable<TOutput>(
+function trpcObservableToRxJsObservable<TInput, TOutput>(
+  opts: RequestOpts<TInput>,
   observable: TrpcObservable<
     OperationResultEnvelope<TOutput, TRPCClientError<AnyRouter>>,
     TRPCClientError<AnyRouter>
   >
 ): RxJSObservable<TOutput> {
   return new RxJSObservable<TOutput>((subscriber) => {
+    // create a macroTask as long as the observable is not a subscription
+    // it will be invoked on data or errors
+    const macroTask = new MacroTask(opts.type !== 'subscription');
+
     const sub = observable.subscribe({
       next: (value) => {
         switch (value.result.type) {
           case 'data':
             subscriber.next(value.result.data);
+            macroTask.invoke();
             break;
           case 'state': // todo
             break;
