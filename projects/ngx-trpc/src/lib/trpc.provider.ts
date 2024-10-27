@@ -1,7 +1,7 @@
 import {InjectionToken, PLATFORM_ID, Provider, TransferState} from '@angular/core';
 import {ITrpcConfig, provideTrpcConfig} from './trpc.config';
 import {AnyRouter} from '@trpc/server';
-import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/createRxjsClient';
+import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/create-rxjs-client';
 import {createWSClient, httpLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
 import {isPlatformBrowser} from '@angular/common';
 import {

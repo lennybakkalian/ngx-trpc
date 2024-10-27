@@ -5,7 +5,7 @@ import {AnyRouter} from '@trpc/server';
 import superjson from 'superjson';
 import {tRPC_CACHE_STATE} from './cache-state';
 
-function makeCacheKey(request: Operation<unknown>): StateKey<string> {
+function makeCacheKey(request: Operation): StateKey<string> {
   const {type, path, input} = request;
   const encodedParams = Object.entries(input ?? {}).reduce(
     (prev, [key, value]) => prev + `${key}=${JSON.stringify(value)}`,
