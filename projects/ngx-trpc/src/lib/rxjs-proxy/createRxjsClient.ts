@@ -15,6 +15,7 @@ import {TRPCClient} from './trpc-client';
 import {TRPCSubscriptionObserver, UntypedClientProperties, YieldType} from './types';
 import {CreateTRPCClientOptions, TRPCClientError} from '@trpc/client';
 import {Observable as RxJSObservable} from 'rxjs';
+import {Signal} from '@angular/core';
 
 /**
  * @public
@@ -31,11 +32,15 @@ type ResolverDef = {
   errorShape: any;
 };
 
-/** @internal */
 export type Resolver<TDef extends ResolverDef> = (
   input: TDef['input'],
   opts?: ProcedureOptions
 ) => RxJSObservable<TDef['output']>;
+
+export type SignalResolver<TDef extends ResolverDef> = (
+  input: TDef['input'],
+  opts?: ProcedureOptions
+) => Signal<TDef['output']>;
 
 type SubscriptionResolver<TDef extends ResolverDef> = (
   input: TDef['input'],
@@ -48,6 +53,7 @@ type DecorateProcedure<
 > = TType extends 'query'
   ? {
       query: Resolver<TDef>;
+      createSignal: SignalResolver<TDef>;
     }
   : TType extends 'mutation'
     ? {
@@ -82,6 +88,7 @@ type DecoratedProcedureRecord<TRouter extends AnyRouter, TRecord extends RouterR
 
 const clientCallTypeMap: Record<keyof DecorateProcedure<any, any>, ProcedureType> = {
   query: 'query',
+  createSignal: 'createSignal',
   mutate: 'mutation',
   subscribe: 'subscription'
 };
