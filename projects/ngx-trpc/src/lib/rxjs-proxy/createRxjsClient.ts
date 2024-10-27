@@ -32,20 +32,25 @@ type ResolverDef = {
   errorShape: any;
 };
 
-export type Resolver<TDef extends ResolverDef> = (
+export type Resolver<TDef extends ResolverDef, TOutput = RxJSObservable<TDef['output']>> = (
   input: TDef['input'],
   opts?: ProcedureOptions
-) => RxJSObservable<TDef['output']>;
+) => TOutput;
 
-export type SignalResolver<TDef extends ResolverDef> = (
-  input: TDef['input'],
-  opts?: ProcedureOptions
-) => Signal<TDef['output']>;
+export type SignalResolver<TDef extends ResolverDef> = Resolver<TDef, Signal<TDef['output']>>;
 
-type SubscriptionResolver<TDef extends ResolverDef> = (
+type SubscriptionResolver<
+  TDef extends ResolverDef,
+  TOutput = RxJSObservable<YieldType<TDef['output']>>
+> = (
   input: TDef['input'],
   opts?: Partial<TRPCSubscriptionObserver<TDef['output'], TRPCClientError<TDef>>> & ProcedureOptions
-) => RxJSObservable<YieldType<TDef['output']>>;
+) => TOutput;
+
+export type SubscriptionSignalResolver<TDef extends ResolverDef> = SubscriptionResolver<
+  TDef,
+  Signal<YieldType<TDef['output']>>
+>;
 
 type DecorateProcedure<
   TType extends ProcedureType,
@@ -53,7 +58,7 @@ type DecorateProcedure<
 > = TType extends 'query'
   ? {
       query: Resolver<TDef>;
-      createSignal: SignalResolver<TDef>;
+      querySignal: SignalResolver<TDef>;
     }
   : TType extends 'mutation'
     ? {
@@ -62,6 +67,7 @@ type DecorateProcedure<
     : TType extends 'subscription'
       ? {
           subscribe: SubscriptionResolver<TDef>;
+          subscribeSignal: SubscriptionSignalResolver<TDef>;
         }
       : never;
 
@@ -88,9 +94,10 @@ type DecoratedProcedureRecord<TRouter extends AnyRouter, TRecord extends RouterR
 
 const clientCallTypeMap: Record<keyof DecorateProcedure<any, any>, ProcedureType> = {
   query: 'query',
-  createSignal: 'createSignal',
+  querySignal: 'querySignal',
   mutate: 'mutation',
-  subscribe: 'subscription'
+  subscribe: 'subscription',
+  subscribeSignal: 'subscriptionSignal'
 };
 
 /** @internal */
