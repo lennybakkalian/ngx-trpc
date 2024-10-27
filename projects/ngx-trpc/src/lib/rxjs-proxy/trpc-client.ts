@@ -13,6 +13,7 @@ import {Maybe, TRPCSubscriptionObserver, TRPCType} from './types';
 import {Observable, Observable as RxJSObservable} from 'rxjs';
 import {createChain} from './createChain';
 import {MacroTask} from '../utils/macro-task';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 interface RequestOpts<TInput> {
   type: TRPCType;
@@ -57,6 +58,19 @@ export class TRPCClient<TRouter extends AnyRouter> {
       signal: opts?.signal
     });
   }
+
+  public createSignal(path: string, input?: unknown, opts?: TRPCRequestOptions) {
+    return toSignal(
+      this.$request({
+        type: 'query',
+        path,
+        input,
+        context: opts?.context,
+        signal: opts?.signal
+      })
+    );
+  }
+
   public mutation(path: string, input?: unknown, opts?: TRPCRequestOptions) {
     return this.$request({
       type: 'mutation',
