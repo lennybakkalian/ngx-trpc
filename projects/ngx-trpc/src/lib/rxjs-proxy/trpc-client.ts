@@ -23,6 +23,8 @@ interface RequestOpts<TInput> {
   signal: Maybe<AbortSignal>;
 }
 
+type SubscriptionOpts = Partial<TRPCSubscriptionObserver<unknown, TRPCClientError<AnyRouter>>>;
+
 export class TRPCClient<TRouter extends AnyRouter> {
   private readonly links: OperationLink<TRouter>[];
   public readonly runtime: TRPCClientRuntime;
@@ -98,15 +100,14 @@ export class TRPCClient<TRouter extends AnyRouter> {
   public subscriptionSignal(
     path: string,
     input: unknown,
-    opts: Partial<TRPCSubscriptionObserver<unknown, TRPCClientError<AnyRouter>>> &
-      TRPCRequestOptions
+    opts: SubscriptionOpts & TRPCRequestOptions
   ) {
     return toSignal(this.subscription(path, input, opts));
   }
 }
 
 function trpcObservableToRxJsObservable<TInput, TOutput>(
-  opts: RequestOpts<TInput>,
+  opts: SubscriptionOpts & RequestOpts<TInput>,
   observable: TrpcObservable<
     OperationResultEnvelope<TOutput, TRPCClientError<AnyRouter>>,
     TRPCClientError<AnyRouter>
@@ -120,16 +121,18 @@ function trpcObservableToRxJsObservable<TInput, TOutput>(
     const sub = observable.subscribe({
       next: (value) => {
         switch (value.result.type) {
+          case undefined:
           case 'data':
             subscriber.next(value.result.data);
             macroTask.invoke();
             break;
           case 'state': // todo
             break;
-          case 'started': // todo
+          case 'started':
+            opts.onStarted?.({context: value.context});
             break;
           case 'stopped':
-            subscriber.complete();
+            opts.onStopped?.();
             break;
         }
       },

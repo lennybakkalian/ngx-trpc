@@ -11,7 +11,7 @@ import {
 } from './utils/cache-state';
 import {transferStateLink} from './utils/transfer-state-link';
 import {FetchHttpClient} from './utils/fetch-http-client';
-import {getPlatformConfig} from './utils/get-platform-config';
+import {getPlatformConfig, normalizeWebSocketUrl} from './utils/config-utils';
 
 export type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
 
@@ -42,6 +42,8 @@ export function provideTrpc<AppRouter extends AnyRouter>(
         let link: TRPCLink<AnyRouter> = trpcHttpLink;
 
         if (config.ws && _isBrowser) {
+          config.ws.url = normalizeWebSocketUrl(config.ws.url);
+
           const wsClient = createWSClient(config.ws);
 
           link = splitLink({

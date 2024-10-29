@@ -39,10 +39,10 @@ importers:
         specifier: ^19.0.0-next.11
         version: 19.0.0-next.11(nucfzcstejanmw3tn2sgaraoeu)
       '@trpc/client':
-        specifier: ^11.0.0-rc.586
+        specifier: 11.0.0-rc.593
         version: 11.0.0-rc.593(@trpc/server@11.0.0-rc.593)
       '@trpc/server':
-        specifier: ^11.0.0-rc.586
+        specifier: 11.0.0-rc.593
         version: 11.0.0-rc.593
       cors:
         specifier: ^2.8.5
