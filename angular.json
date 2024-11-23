@@ -69,7 +69,7 @@
             ],
             "scripts": [],
             "server": "projects/example/src/main.server.ts",
-            "outputMode": "server",
+            "externalDependencies": [""],
             "ssr": {
               "entry": "projects/example/src/server.ts"
             }
