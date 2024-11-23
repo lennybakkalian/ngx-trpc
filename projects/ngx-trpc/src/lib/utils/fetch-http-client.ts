@@ -1,8 +1,7 @@
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, REQUEST, RESPONSE_INIT} from '@angular/core';
 import {firstValueFrom} from 'rxjs';
 import {TRPC_CONFIG} from '../trpc.config';
-import {REQUEST, RESPONSE_INIT} from '@angular/ssr';
 
 interface FetchImpl {
   fetch: typeof fetch;

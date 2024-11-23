@@ -5,10 +5,9 @@ import {TRPC} from '../app.config';
 import {scan, startWith, Subject, switchMap} from 'rxjs';
 
 @Component({
-  selector: 'app-demo-page',
-  standalone: true,
-  imports: [AsyncPipe, ReactiveFormsModule, JsonPipe],
-  templateUrl: './demo-page.component.html'
+    selector: 'app-demo-page',
+    imports: [AsyncPipe, ReactiveFormsModule, JsonPipe],
+    templateUrl: './demo-page.component.html'
 })
 export class DemoPageComponent {
   readonly trpc = inject(TRPC);
