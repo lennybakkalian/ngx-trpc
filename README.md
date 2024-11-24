@@ -70,6 +70,14 @@ export class DemoComponent {
 }
 ```
 
+## Known Issues
+* **Headers are not forwarded when performing requests in ssr.**
+
+  _Add this provider to your `app.config.server.ts` file to fix this issue:_
+  ```typescript
+  provideServerRoutesConfig([{path: '**', renderMode: RenderMode.Server}])
+  ```
+
 ## TODOs 📝
 
 - [ ] Additional Unit Tests for SSR and WebSocket Subscriptions.

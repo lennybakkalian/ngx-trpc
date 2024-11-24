@@ -24,4 +24,4 @@ export interface TRPCSubscriptionObserver<TValue, TError> {
   onComplete: () => void;
 }
 
-export type YieldType<T> = T extends AsyncGenerator<infer Y> ? Y : never;
+export type YieldType<T> = inferAsyncIterableYield<T>;
