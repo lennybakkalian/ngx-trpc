@@ -12,7 +12,7 @@
 <div class="demo-container" style="flex-direction:column">
   post list that gets queried after mutation
   <pre>
-    @for (post of posts$ | async; track post.id) {
+    @for (post of postsRef.value(); track post.id) {
       {{ post.title }}
     }
   </pre>

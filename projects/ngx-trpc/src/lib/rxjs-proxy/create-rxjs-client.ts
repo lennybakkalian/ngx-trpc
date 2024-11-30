@@ -25,6 +25,11 @@ export type inferRouterClient<TRouter extends AnyRouter> = DecoratedProcedureRec
   TRouter['_def']['record']
 >;
 
+export type QueryRefOutput<T> = {
+  value: Signal<T>;
+  refetch: () => void;
+};
+
 type ResolverDef = {
   input: any;
   output: any;
@@ -38,6 +43,10 @@ export type Resolver<TDef extends ResolverDef, TOutput = RxJSObservable<TDef['ou
 ) => TOutput;
 
 export type SignalResolver<TDef extends ResolverDef> = Resolver<TDef, Signal<TDef['output']>>;
+export type QueryRefSignalResolver<TDef extends ResolverDef> = Resolver<
+  TDef,
+  QueryRefOutput<TDef['output']>
+>;
 
 type SubscriptionResolver<
   TDef extends ResolverDef,
@@ -59,6 +68,7 @@ type DecorateProcedure<
   ? {
       query: Resolver<TDef>;
       querySignal: SignalResolver<TDef>;
+      queryRef: QueryRefSignalResolver<TDef>;
     }
   : TType extends 'mutation'
     ? {
@@ -95,6 +105,7 @@ type DecoratedProcedureRecord<TRouter extends AnyRouter, TRecord extends RouterR
 const clientCallTypeMap: Record<keyof DecorateProcedure<any, any>, ProcedureType> = {
   query: 'query',
   querySignal: 'querySignal',
+  queryRef: 'queryRef',
   mutate: 'mutation',
   subscribe: 'subscription',
   subscribeSignal: 'subscriptionSignal'

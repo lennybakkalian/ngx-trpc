@@ -5,20 +5,16 @@ import {TRPC} from '../app.config';
 import {scan, startWith, Subject, switchMap} from 'rxjs';
 
 @Component({
-    selector: 'app-demo-page',
-    imports: [AsyncPipe, ReactiveFormsModule, JsonPipe],
-    templateUrl: './demo-page.component.html'
+  selector: 'app-demo-page',
+  imports: [AsyncPipe, ReactiveFormsModule, JsonPipe],
+  templateUrl: './demo-page.component.html'
 })
 export class DemoPageComponent {
   readonly trpc = inject(TRPC);
 
   demoQuery$ = this.trpc.hello.query();
 
-  refreshPosts$ = new Subject<void>();
-  posts$ = this.refreshPosts$.pipe(
-    startWith(null),
-    switchMap(() => this.trpc.listPosts.query())
-  );
+  postsRef = this.trpc.listPosts.queryRef();
 
   addPostTitle = new FormControl('random-post');
 
@@ -30,7 +26,8 @@ export class DemoPageComponent {
     this.trpc.createPost
       .mutate({title: this.addPostTitle.value!})
       .subscribe((mutation_response) => {
-        this.refreshPosts$.next();
+        console.log(this.postsRef);
+        this.postsRef.refetch();
         console.log({mutation_response});
       });
   }

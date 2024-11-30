@@ -10,10 +10,11 @@ import {
   TRPCRequestOptions
 } from '@trpc/client';
 import {Maybe, TRPCSubscriptionObserver, TRPCType} from './types';
-import {Observable, Observable as RxJSObservable} from 'rxjs';
+import {Observable, Observable as RxJSObservable, startWith, Subject, switchMap} from 'rxjs';
 import {createChain} from './create-chain';
 import {MacroTask} from '../utils/macro-task';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {QueryRefOutput} from './create-rxjs-client';
 
 interface RequestOpts<TInput> {
   type: TRPCType;
@@ -63,6 +64,23 @@ export class TRPCClient<TRouter extends AnyRouter> {
 
   public querySignal(path: string, input?: unknown, opts?: TRPCRequestOptions) {
     return toSignal(this.query(path, input, opts));
+  }
+
+  public queryRef(
+    path: string,
+    input?: unknown,
+    opts?: TRPCRequestOptions
+  ): QueryRefOutput<unknown> {
+    const refetch$ = new Subject<void>();
+    return {
+      refetch: () => refetch$.next(),
+      value: toSignal(
+        refetch$.pipe(
+          startWith(null),
+          switchMap(() => this.query(path, input, opts))
+        )
+      )
+    };
   }
 
   public mutation(path: string, input?: unknown, opts?: TRPCRequestOptions) {
