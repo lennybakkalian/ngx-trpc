@@ -2,7 +2,7 @@ import {InjectionToken, PLATFORM_ID, Provider, TransferState} from '@angular/cor
 import {ITrpcConfig, provideTrpcConfig} from './trpc.config';
 import {AnyRouter} from '@trpc/server';
 import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/create-rxjs-client';
-import {createWSClient, httpLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
+import {createWSClient, httpBatchLink, splitLink, TRPCLink, wsLink} from '@trpc/client';
 import {isPlatformBrowser} from '@angular/common';
 import {
   provideTrpcCacheState,
@@ -34,7 +34,7 @@ export function provideTrpc<AppRouter extends AnyRouter>(
 
         const httpConfig = getPlatformConfig(_isBrowser, config.http, config.ssr?.http);
 
-        const trpcHttpLink = httpLink({
+        const trpcHttpLink = httpBatchLink({
           url: httpConfig.url,
           fetch: fetchHttpClient.fetch.bind(fetchHttpClient)
         });
