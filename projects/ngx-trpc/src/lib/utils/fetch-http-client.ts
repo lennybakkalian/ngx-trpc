@@ -1,7 +1,8 @@
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {inject, Injectable, REQUEST, RESPONSE_INIT} from '@angular/core';
+import {inject, Injectable, PLATFORM_ID, REQUEST, RESPONSE_INIT} from '@angular/core';
 import {firstValueFrom} from 'rxjs';
 import {TRPC_CONFIG} from '../trpc.config';
+import {isPlatformBrowser} from '@angular/common';
 
 interface FetchImpl {
   fetch: typeof fetch;
@@ -13,6 +14,7 @@ export class FetchHttpClient implements FetchImpl {
   private _request = inject(REQUEST, {optional: true});
   private _response = inject(RESPONSE_INIT, {optional: true});
   private _trpcConfig = inject(TRPC_CONFIG);
+  private _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     if (typeof input != 'string') {
@@ -26,6 +28,15 @@ export class FetchHttpClient implements FetchImpl {
     if (this._request) {
       this._request.headers.forEach((value: string, key: string) => {
         headers = headers.set(key, value);
+      });
+    }
+
+    if (!this._isBrowser && !this._request) {
+      // Angular is doing a single server-side render after starting the app. Prob a bug in Angular.
+      // This will prevent an unnecessary createContext call.
+      return new Response('{}', {
+        status: 500,
+        statusText: 'Request is not available on the server.'
       });
     }
 
