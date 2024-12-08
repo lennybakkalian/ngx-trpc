@@ -4,5 +4,5 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "allowedNonPeerDependencies": ["superjson", "@trpc/client", "@trpc/server"]
+  "allowedNonPeerDependencies": ["superjson", "@trpc/client", "@trpc/server", "cookie"]
 }

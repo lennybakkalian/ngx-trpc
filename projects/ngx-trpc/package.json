@@ -18,7 +18,8 @@
     "tslib": "^2.3.0",
     "superjson": "^2.2.1",
     "@trpc/client": "^11.0.0-rc.643",
-    "@trpc/server": "^11.0.0-rc.643"
+    "@trpc/server": "^11.0.0-rc.643",
+    "cookie": "^1.0.2"
   },
   "sideEffects": false,
   "publishConfig": {
