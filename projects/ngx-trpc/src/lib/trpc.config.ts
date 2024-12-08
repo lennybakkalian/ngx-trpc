@@ -38,5 +38,11 @@ export interface ITrpcConfig {
      * Default: `['set-cookie']`
      */
     forwardHeaders?: string[];
+
+    /**
+     * Disable sequential requests in SSR context.
+     * Only enable this, if you don't set cookies in createContext while doing sequential requests in ssr.
+     */
+    disableSequentialRequests?: boolean;
   };
 }

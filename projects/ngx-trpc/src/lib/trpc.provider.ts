@@ -1,4 +1,11 @@
-import {InjectionToken, PLATFORM_ID, Provider, TransferState} from '@angular/core';
+import {
+  InjectionToken,
+  PLATFORM_ID,
+  Provider,
+  REQUEST,
+  RESPONSE_INIT,
+  TransferState
+} from '@angular/core';
 import {ITrpcConfig, provideTrpcConfig} from './trpc.config';
 import {AnyRouter} from '@trpc/server';
 import {CreateTRPCClient, createTRPCRxJSProxyClient} from './rxjs-proxy/create-rxjs-client';
@@ -10,8 +17,8 @@ import {
   tRPC_CACHE_STATE
 } from './utils/cache-state';
 import {transferStateLink} from './utils/transfer-state-link';
-import {FetchHttpClient} from './utils/fetch-http-client';
 import {getPlatformConfig, normalizeWebSocketUrl} from './utils/config-utils';
+import {FetchMiddleware} from './utils/fetch.middleware';
 
 export type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
 
@@ -29,14 +36,16 @@ export function provideTrpc<AppRouter extends AnyRouter>(
     provideTrpcCacheStateStatusManager(),
     {
       provide: token,
-      useFactory: (fetchHttpClient: FetchHttpClient, platformId: Object) => {
+      useFactory: (req: Request | null, res: ResponseInit | null, platformId: Object) => {
         const _isBrowser = isPlatformBrowser(platformId);
 
         const httpConfig = getPlatformConfig(_isBrowser, config.http, config.ssr?.http);
 
+        const fetchMiddleware = new FetchMiddleware(config, req, res);
+
         const trpcHttpLink = httpBatchLink({
           url: httpConfig.url,
-          fetch: fetchHttpClient.fetch.bind(fetchHttpClient)
+          fetch: _isBrowser ? undefined : (input, init) => fetchMiddleware.fetch(input, init)
         });
 
         let link: TRPCLink<AnyRouter> = trpcHttpLink;
@@ -57,7 +66,7 @@ export function provideTrpc<AppRouter extends AnyRouter>(
           links: [transferStateLink(), link]
         });
       },
-      deps: [FetchHttpClient, PLATFORM_ID, tRPC_CACHE_STATE, TransferState]
+      deps: [REQUEST, RESPONSE_INIT, PLATFORM_ID, tRPC_CACHE_STATE, TransferState]
     }
   ];
 }
