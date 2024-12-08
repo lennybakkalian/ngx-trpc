@@ -17,7 +17,7 @@ import {
   tRPC_CACHE_STATE
 } from './utils/cache-state';
 import {transferStateLink} from './utils/transfer-state-link';
-import {getPlatformConfig, normalizeWebSocketUrl} from './utils/config-utils';
+import {getPlatformConfig, normalizeHttpUrl, normalizeWebSocketUrl} from './utils/config-utils';
 import {FetchMiddleware} from './utils/fetch.middleware';
 
 export type TrpcClient<TRouter extends AnyRouter> = CreateTRPCClient<TRouter>;
@@ -39,12 +39,17 @@ export function provideTrpc<AppRouter extends AnyRouter>(
       useFactory: (req: Request | null, res: ResponseInit | null, platformId: Object) => {
         const _isBrowser = isPlatformBrowser(platformId);
 
-        const httpConfig = getPlatformConfig(_isBrowser, config.http, config.ssr?.http);
+        const httpConfig = getPlatformConfig(!_isBrowser, config.http, config.ssr?.http);
 
         const fetchMiddleware = new FetchMiddleware(config, req, res);
 
+        const url = normalizeHttpUrl(
+          req?.url ? new URL(req?.url ?? '').origin : '',
+          httpConfig.url
+        );
+
         const trpcHttpLink = httpBatchLink({
-          url: httpConfig.url,
+          url: url,
           fetch: _isBrowser ? undefined : (input, init) => fetchMiddleware.fetch(input, init)
         });
 
