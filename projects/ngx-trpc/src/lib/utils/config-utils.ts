@@ -18,3 +18,10 @@ export function normalizeWebSocketUrl(url: string) {
     return protocol + host + url;
   }
 }
+
+export function normalizeHttpUrl(origin: string, url: string) {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return origin + (url.startsWith('/') ? url : '/' + url);
+}
