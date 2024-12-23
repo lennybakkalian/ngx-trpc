@@ -45,7 +45,16 @@ export class FetchMiddleware {
           init = {...init, headers};
         }
 
-        const r = await fetch(input, init);
+        if (this._config.debug) {
+          console.log('[ngx-trpc] fetch', input);
+        }
+
+        const r = await fetch(input, init).catch((e) => {
+          if (this._config.debug) {
+            console.error('[ngx-trpc] fetch error', e);
+          }
+          return e;
+        });
         if (this._response && this._response.headers && this._response.headers instanceof Headers) {
           for (let [key, value] of r.headers) {
             if (this._config.ssr?.forwardHeaders?.includes(key) || key === 'set-cookie') {

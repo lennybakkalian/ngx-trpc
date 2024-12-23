@@ -45,4 +45,6 @@ export interface ITrpcConfig {
      */
     disableSequentialRequests?: boolean;
   };
+
+  debug?: boolean;
 }
