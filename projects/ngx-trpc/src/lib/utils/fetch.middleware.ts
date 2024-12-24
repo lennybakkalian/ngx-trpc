@@ -50,12 +50,8 @@ export class FetchMiddleware {
             console.log('[ngx-trpc] fetch', input);
           }
 
-          const r = await fetch(input, init).catch((e) => {
-            if (this._config.debug) {
-              console.error('[ngx-trpc] fetch error', e);
-            }
-            return e;
-          });
+          const r = await fetch(input, init);
+
           if (
             this._response &&
             this._response.headers &&
@@ -75,7 +71,7 @@ export class FetchMiddleware {
           return r;
         } catch (e) {
           if (this._config.debug) {
-            console.error('[ngx-trpc] fetch middleware error', e);
+            console.error('[ngx-trpc] fetch middleware error', e, {url: input});
           }
           throw e;
         }
