@@ -1,6 +1,7 @@
 import {ITrpcConfig} from '../trpc.config';
 import * as cookie from 'cookie';
 import {Mutex, wrapInMutex} from '../libs/mutex.util';
+import {TRPCError} from '@trpc/server';
 
 export class FetchMiddleware {
   private _setCookiesCache?: string;
@@ -50,7 +51,7 @@ export class FetchMiddleware {
             console.log('[ngx-trpc] fetch', input);
           }
 
-          const r = await fetch(input, init);
+          const r = await this.fetchImpl(input, init);
 
           if (
             this._response &&
@@ -79,5 +80,17 @@ export class FetchMiddleware {
       this._mutex,
       this._config.ssr?.disableSequentialRequests
     );
+  }
+
+  async fetchImpl(input: RequestInfo | URL | string, init?: RequestInit) {
+    const r = await fetch(input, init);
+    if (!r.headers.get('content-type')?.includes('json')) {
+      // delay the error a bit to make sure we don't spam the server for retries. (e.g. while server is restarting)
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      throw new TRPCError({
+        code: 'UNSUPPORTED_MEDIA_TYPE'
+      });
+    }
+    return r;
   }
 }

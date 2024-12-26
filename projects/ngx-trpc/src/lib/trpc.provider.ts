@@ -50,7 +50,8 @@ export function provideTrpc<AppRouter extends AnyRouter>(
 
         const trpcHttpLink = httpBatchLink({
           url: url,
-          fetch: _isBrowser ? undefined : (input, init) => fetchMiddleware.fetch(input, init)
+          fetch: (input, init) =>
+            _isBrowser ? fetchMiddleware.fetchImpl(input, init) : fetchMiddleware.fetch(input, init)
         });
 
         let link: TRPCLink<AnyRouter> = trpcHttpLink;
